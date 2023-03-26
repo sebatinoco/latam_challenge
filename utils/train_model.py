@@ -3,7 +3,7 @@ from utils.resample import resample
 from sklearn.metrics import classification_report, f1_score
 from sklearn.utils import compute_sample_weight
 
-def train_model(df, target, pipeline, param_under = None, param_over = None, fit_weights = False, random_state = 3380):
+def train_model(df, target, pipeline, param_under = None, param_over = None, fit_weights = False, random_state = 3380, report = True):
     '''
     Función que recibe un pipeline y lo entrena.
     df: datos sobre los que ejecutar el pipeline
@@ -24,8 +24,6 @@ def train_model(df, target, pipeline, param_under = None, param_over = None, fit
     if (param_under is not None) | (param_over is not None):
         X_train, y_train = resample(X_train, y_train, param_over = param_over, param_under = param_under, random_state = random_state)
 
-    print(f'{X_train.shape[0]} observaciones para entrenar!')
-
     # entrenamos, podemos agregar factores de expansión
     if fit_weights:
         sample_weight = compute_sample_weight(class_weight = 'balanced', y = y_train)
@@ -36,6 +34,13 @@ def train_model(df, target, pipeline, param_under = None, param_over = None, fit
     # entrenamos pipeline y obtenemos predicciones
     y_pred = pipeline.predict(X_test)
 
-    # print de métricas
-    print(f"F1: {f1_score(y_test, y_pred, average = 'macro'):.3f}")
-    print(classification_report(y_test, y_pred))
+    # metrics
+    
+    f1 = f1_score(y_test, y_pred, average = 'macro')
+    
+    if report:
+    
+        print(f"F1: {f1:.3f}")
+        print(classification_report(y_test, y_pred))
+    
+    return f1
