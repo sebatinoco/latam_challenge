@@ -3,7 +3,7 @@ from utils.resample import resample
 from sklearn.metrics import classification_report, f1_score
 from sklearn.utils import compute_sample_weight
 
-def train_model(df, target, pipeline, param_under = None, param_over = None, fit_weights = False, random_state = 3380, report = True):
+def evaluate_model(df, target, pipeline, param_under = None, param_over = None, fit_weights = False, random_state = 3380, report = True):
     '''
     Función que recibe un pipeline y lo entrena.
     df: datos sobre los que ejecutar el pipeline
@@ -42,5 +42,3 @@ def train_model(df, target, pipeline, param_under = None, param_over = None, fit
     
         print(f"F1: {f1:.3f}")
         print(classification_report(y_test, y_pred))
-    
-    return f1
