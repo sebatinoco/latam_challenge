@@ -17,6 +17,7 @@ def train_model(df, target, pipeline, param_under = None, param_over = None, fit
     # dividimos datos usando estratificación
     y = df[target].copy()
     X = df.drop(columns = target).copy()
+    
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = .33, shuffle = True, stratify = y, random_state = random_state)
 
     # podemos especificar under y over sampling
