@@ -6,13 +6,19 @@ from utils.cramers_v import cramers_v
 
 def plot_cramer(df, vars):
     
+    '''
+    Plot heatmap using cramer's v score
+    df: dataframe containing vars as columns (pandas.DataFrame)
+    vars: list of variables stored as columns in df (list)
+    '''
+    
     dataframe = pd.DataFrame()
     for x in vars:
         for y in vars:
             dataframe.loc[x, y] = cramers_v(df[x], df[y])
     
     # Generate a mask for the upper triangle
-    mask = np.triu(np.ones_like(dataframe, dtype=bool))
+    mask = np.triu(np.ones_like(dataframe, dtype = bool))
 
     # Set up the matplotlib figure
     f, ax = plt.subplots(figsize = (11, 6))
@@ -23,5 +29,5 @@ def plot_cramer(df, vars):
     # Draw the heatmap with the mask and correct aspect ratio
     sns.heatmap(dataframe, mask = None, cmap = cmap, vmax = 1.0, center = 0,
                 square = True, linewidths = .5, cbar_kws = {"shrink": .5})
-    plt.title("Heatmap using Cramer's V")
+    plt.title("Heatmap using Cramer's V score")
     plt.show()

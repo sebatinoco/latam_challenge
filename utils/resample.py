@@ -7,15 +7,15 @@ from imblearn.under_sampling import RandomUnderSampler
 def resample(X, y, param_over = False, param_under = False, random_state = 3380):
 
     '''
-    Función que recibe dataframes de entrada y los devuelve resampleados.
-    X: dataframe de entrada (X_train)
-    y: dataframe de entrada (y_train)
-    param_over: factor por el que se hará oversampling
-    param_under: factor por el que se hará subsampling
+    Function that receives input dataframes and returns resampled dataframes.
+    X: input dataframe (X_train)
+    y: input dataframe (y_train)
+    param_over: factor by which oversampling will be done
+    param_under: factor by which undersampling will be done
     '''
 
     
-    target_classes = [1] # clase problemática
+    target_classes = [1] # minority class
     
     # Oversampling
     if param_over:

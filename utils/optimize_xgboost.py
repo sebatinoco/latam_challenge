@@ -10,13 +10,22 @@ def optimize_xgboost(X_train, y_train, base_pipeline, random_state = 3380,
                    max_depth = 6, learning_rate = 0.3, n_estimators = 50, min_child_weight = 1, 
                    gamma = 0, subsample = 1, colsample_bytree = 1, reg_alpha = 0, reg_lambda = 1):
     '''
-    Función que recibe un pipeline y lo entrena.
-    X_train: Matriz de features de entrenamiento (np.array)
-    y_train: Vector objetivo a predecir (np.array)
-    pipeline: Objeto Pipeline a ser entrenado (sklearn.Pipeline)
-    param_over: Factor por el que se hará oversampling (float)
-    param_under: Factor por el que se hará subsampling (float)
-    fit_weights: Indica si queremos usar los "factores de expansión" de la muestra. Puede mejorar el desbalance de clases (bool)
+    Function that receives a pipeline and trains it using XGBoost.
+    X_train: Training features matrix (np.array)
+    y_train: Target vector to predict (np.array)
+    pipeline: Pipeline object to be trained (sklearn.Pipeline)
+    param_over: Factor by which oversampling will be done (float)
+    param_under: Factor by which undersampling will be done (float)
+    fit_weights: Indicates whether we want to use the "sample expansion factors". It can improve class imbalance (bool)
+    max_depth: Maximum tree depth for base learners. (int)
+    learning_rate: Boosting learning rate (xgb's "eta") (float)
+    n_estimators: Number of boosting rounds (int)
+    min_child_weight: Minimum sum of instance weight (hessian) needed in a child (float)
+    gamma: Minimum loss reduction required to make a further partition on a leaf node of the tree (float)
+    subsample: Subsample ratio of the training instances (float)
+    colsample_bytree: subsample ratio of columns when constructing each tree (float)
+    reg_alpha: L2 regularization term on weights (float)
+    reg_lambda: L2 regularization term on weights (float)
     '''
 
     xgboost_params = {
@@ -31,14 +40,14 @@ def optimize_xgboost(X_train, y_train, base_pipeline, random_state = 3380,
         'reg_lambda': reg_lambda,
         }
 
-    # podemos especificar under y over sampling
+    # resampling
     if (param_under is not None) | (param_over is not None):
         X_train, y_train = resample(X_train, y_train, param_over = param_over, param_under = param_under, random_state = random_state)
 
     pipeline = deepcopy(base_pipeline)
     pipeline.steps.append(('clf', XGBClassifier(random_state = random_state, **xgboost_params)))
 
-    # entrenamos, podemos agregar factores de expansión
+    # we can add expansion weights
     if fit_weights:
         sample_weight = compute_sample_weight(class_weight = 'balanced', y = y_train)
         pipeline.fit(X_train, y_train, clf__sample_weight = sample_weight)
@@ -46,6 +55,7 @@ def optimize_xgboost(X_train, y_train, base_pipeline, random_state = 3380,
         pipeline.fit(X_train, y_train)
 
 
+    # evaluate using KFold CV
     cv = KFold(n_splits = 10, shuffle = True, random_state = random_state)
     scores = cross_val_score(pipeline, X_train, y_train , scoring = 'f1_macro', cv = cv)
     f1_avg = np.mean(scores)
